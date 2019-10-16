@@ -6,12 +6,13 @@ from netCDF4 import Dataset
 import os
 import datetime
 import cartopy.crs as ccrs
+from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
 
 ##################################      User input      ############################################
 
 geos_ver = '525'
 fp_or_fpp = 'fpp'
-date = '20190826'
+date = '20190825'
 fields = ['u','v','tv','sphu']
 level_to_plot = 'maxrms'       #Provide a level number or simply 'maxrms' to plot level of max spike
 
@@ -48,8 +49,8 @@ f15 = path+'H15/f'+geos_ver+'_'+fp_or_fpp+'.fsens_twe.eta.'+dtr15s+'z+'+dtvers+'
 f21 = path+'H21/f'+geos_ver+'_'+fp_or_fpp+'.fsens_twe.eta.'+dtr21s+'z+'+dtvers+'z-'+dtanas+'z.nc4'
 
 print("\n Looking for the following files:")
-print(f15)
-print(f21)
+print(" "+f15)
+print(" "+f21)
 
 if (not os.path.exists(f15)):
     print("File for 15z does not exist, aborting")
@@ -101,6 +102,8 @@ for f in range(nf):
   f15[f,:,:,:] = fh15.variables[fields[f]][:,:,:]
   f21[f,:,:,:] = fh21.variables[fields[f]][:,:,:]
 
+fh15.close()
+fh21.close()
 
 # Compute RMS
 # -----------
@@ -141,7 +144,6 @@ for f in range(nf):
   if (level_to_plot == "maxrms"):
     pltlev15 = np.argmax(f15_rms[f,:])
     pltlev21 = np.argmax(f21_rms[f,:])
-    print(pltlev15, pltlev21)
     if (f21_rms[f,pltlev21] >= f15_rms[f,pltlev15]):
       pltlev = pltlev21
     else:
@@ -157,19 +159,33 @@ for f in range(nf):
 
   clev_max = np.max([np.abs(f15plt), np.abs(f21plt)])
   clev_inc = 2*clev_max/12.
-  clev = np.arange(-clev_max,clev_max,clev_inc)
+  clev = np.arange(-clev_max,clev_max+clev_inc,clev_inc)
 
   fig = plt.figure(figsize=(12, 12))
-  ax = fig.add_subplot(2, 1, 1, projection=ccrs.PlateCarree())
-  ax.contourf(lons, lats, f15plt, clev,
-              transform=ccrs.PlateCarree(), cmap='seismic')
-  ax.coastlines()
-  ax.set_global()
+  ax1 = fig.add_subplot(2, 1, 1, projection=ccrs.PlateCarree())
+  cont1 = ax1.contourf(lons, lats, f15plt, clev,
+                       transform=ccrs.PlateCarree(), cmap='RdYlBu')
+  ax1.set_global()
+  ax1.coastlines()
+  ax1.set_xticks([-180, -120, -60, 0, 60, 120, 180], crs=ccrs.PlateCarree())
+  ax1.set_yticks([-90, -60, -30, 0, 30, 60, 90], crs=ccrs.PlateCarree())
+  lon_formatter = LongitudeFormatter(zero_direction_label=True)
+  lat_formatter = LatitudeFormatter()
+  ax1.xaxis.set_major_formatter(lon_formatter)
+  ax1.yaxis.set_major_formatter(lat_formatter)
+  fig.colorbar(cont1, ax=ax1)
 
-  ax = fig.add_subplot(2, 1, 2, projection=ccrs.PlateCarree())
-  ax.contourf(lons, lats, f21plt, clev,
-              transform=ccrs.PlateCarree(), cmap='seismic')
-  ax.coastlines()
-  ax.set_global()
+  ax2 = fig.add_subplot(2, 1, 2, projection=ccrs.PlateCarree())
+  cont2 = ax2.contourf(lons, lats, f21plt, clev,
+                       transform=ccrs.PlateCarree(), cmap='RdYlBu')
+  ax2.set_global()
+  ax2.coastlines()
+  ax2.set_xticks([-180, -120, -60, 0, 60, 120, 180], crs=ccrs.PlateCarree())
+  ax2.set_yticks([-90, -60, -30, 0, 30, 60, 90], crs=ccrs.PlateCarree())
+  lon_formatter = LongitudeFormatter(zero_direction_label=True)
+  lat_formatter = LatitudeFormatter()
+  ax2.xaxis.set_major_formatter(lon_formatter)
+  ax2.yaxis.set_major_formatter(lat_formatter)
+  fig.colorbar(cont2, ax=ax2)
 
   fig.savefig(pltfname)
