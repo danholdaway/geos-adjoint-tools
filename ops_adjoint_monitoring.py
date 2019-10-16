@@ -80,8 +80,8 @@ if (not os.path.exists(f21)):
     exit()
 
 print("\n Demigrating archived files")
-#os.system("dmget "+f15)
-#os.system("dmget "+f21)
+os.system("dmget "+f15)
+os.system("dmget "+f21)
 
 
 # Read the fields from the file
