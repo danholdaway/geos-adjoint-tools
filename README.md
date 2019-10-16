@@ -15,6 +15,6 @@ Several arguments are required when calling this tool:
 Example:
 
     module load other/python/GEOSpyD/Ana2019.03_py3.7
-    python ops_adjoint_monitoring.py -g 525 -v fpp -d 20190826 -f u,v -l 50
+    python ops_adjoint_monitoring.py -g 525 -v fpp -d 20190826 -f u v -l 50
 
 This software requires netcdf, cartopy and matplotlib
