@@ -1,3 +1,6 @@
+# External libraries
+# ------------------
+
 import numpy as np
 import matplotlib
 matplotlib.use("Agg")
@@ -7,16 +10,32 @@ import os
 import datetime
 import cartopy.crs as ccrs
 from cartopy.mpl.ticker import LongitudeFormatter, LatitudeFormatter
+import argparse
 
-##################################      User input      ############################################
 
-geos_ver = '525'
-fp_or_fpp = 'fpp'
-date = '20190825'
-fields = ['u','v','tv','sphu']
-level_to_plot = 'maxrms'       #Provide a level number or simply 'maxrms' to plot level of max spike
+# User input
+# ----------
 
-####################################################################################################
+sargs=argparse.ArgumentParser()
+sargs.add_argument( "-g", "--geos_ver",      default='522')
+sargs.add_argument( "-v", "--fp_or_fpp",     default='fp')
+sargs.add_argument( "-d", "--date",          default='20191001')
+sargs.add_argument( "-f", "--fields",        default=['u', 'v', 'tv', 'sphu'], nargs="*")
+sargs.add_argument( "-l", "--level_to_plot", default='maxrms')
+
+args = sargs.parse_args()
+geos_ver = args.geos_ver
+fp_or_fpp = args.fp_or_fpp
+date = args.date
+fields = args.fields
+level_to_plot = args.level_to_plot
+
+print("\n Running OPS adjoint monitoring tool with the following options: \n")
+print("  - GEOS Version: "+geos_ver)
+print("  - fp or fpp: "+fp_or_fpp)
+print("  - Date: "+date)
+print("  - Fields to plot: ",fields)
+print("  - Level to plot: "+level_to_plot)
 
 
 # Prepare file path and names
